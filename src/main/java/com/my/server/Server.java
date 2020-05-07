@@ -16,6 +16,8 @@ public class Server {
      * @throws IOException
      */
     public static  void startService( int port) throws IOException{
+        //gracefully exit
+        //...
         ServerSocket serverSocket = new ServerSocket(port);
         //server never stop
         while (true){
@@ -30,7 +32,11 @@ public class Server {
     }
 
     public static void main(String[] args) {
-
+        try {
+            Server.startService(50010);
+        }catch (Exception e){
+            logger.error(e+"");
+        }
     }
 
 }
