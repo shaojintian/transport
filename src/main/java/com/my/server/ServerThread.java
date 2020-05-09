@@ -36,7 +36,7 @@ public class ServerThread implements Runnable{
             // 创建 Response 对象
             Response response = new Response(output);
             response.packageRequest(request);
-            response.sendHtml();
+            response.sendResponse();
 
             // 关闭 socket 对象
             socket.close();

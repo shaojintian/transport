@@ -8,6 +8,7 @@ public class Request {
     private InputStream input;
     // /xxx-station.html
     private String uri;
+    private StringBuffer request;
 
     public Request(InputStream input) {
         this.input = input;
@@ -15,7 +16,7 @@ public class Request {
 
     //从InputStream中读取request信息，并从request中获取uri值
     public void parse() {
-        StringBuffer request = new StringBuffer(2048);
+        request = new StringBuffer(2048);
         int i=-1;
         byte[] buffer = new byte[2048];
         try {
@@ -56,4 +57,5 @@ public class Request {
         return uri;
     }
 
+    public StringBuffer getRequest(){return this.request;}
 }
