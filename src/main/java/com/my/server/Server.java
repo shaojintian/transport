@@ -10,15 +10,26 @@ import java.net.Socket;
 public class Server {
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    public static final String WEB_ROOT = "./script";
+
     /**
-     * based on socket
-     * @param port
+     *
+     * @param args
      * @throws IOException
      */
-    public static  void startService( int port) throws IOException{
+    public static  void startService( String[] args) throws IOException{
         //gracefully exit
         //...
-        ServerSocket serverSocket = new ServerSocket(port);
+        String name =args[0];;
+        int tcpPort = Integer.parseInt(args[1]);
+        int udpPort = Integer.parseInt(args[2]);
+        int[] des = new int[args.length-3];
+        //[3,...] des udpPort
+        for (int i = 0; i <des.length ; i++) {
+            des[i]=Integer.parseInt(args[3+i]);
+        }
+        //socket
+        ServerSocket serverSocket = new ServerSocket(tcpPort);
         //server never stop
         while (true){
             logger.info("Waiting a socket in ");
@@ -33,7 +44,7 @@ public class Server {
 
     public static void main(String[] args) {
         try {
-            Server.startService(50010);
+            Server.startService(args);
         }catch (Exception e){
             logger.error(e+"");
         }

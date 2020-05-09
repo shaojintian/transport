@@ -1,22 +1,19 @@
 package com.my.server;
 
+import com.alibaba.fastjson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import springfox.documentation.spring.web.json.Json;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Method;
-import java.net.Socket;
-
+import java.io.*;
+import java.net.*;
 public class ServerThread implements Runnable{
     private static final Logger logger = LoggerFactory.getLogger(ServerThread.class);
     private Socket socket;
     //private T obj;
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
-
+    private BufferedReader is;
+    private OutputStream os;
+    //why need buffer ? because we need to package the req/res
     public ServerThread(Socket socket){
         this.socket =socket;
         //this.obj=obj;
@@ -24,28 +21,28 @@ public class ServerThread implements Runnable{
 
     @Override
     public void run(){
-        //服务端接受invoked method params,types and method name && class which this method in
+        InputStream input = null;
+        OutputStream output = null;
         try {
-            ois =  new ObjectInputStream(socket.getInputStream());
-            //read clazz of rpc method
-            Object obj = ois.readObject();
+            //等待连接，连接成功后，返回一个Socket对象
+            input = socket.getInputStream();
+            output = socket.getOutputStream();
 
-            //write ans to oos
-            String ans = "successful!!this is java server";
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            try {
-                oos.writeObject(ans);
-            }catch (Exception e){
-                System.out.println("error:"+this.getClass().getName()+e);
-            }
+            // 创建Request对象并解析
+            Request request = new Request(input);
+            request.parse();
 
-            logger.info("Sending ans to client successful!");
-        }catch (Exception e){
-            logger.error("server err");
-        }finally {
-            close(ois);
-            close(oos);
-            close(socket);
+
+            // 创建 Response 对象
+            Response response = new Response(output);
+            response.packageRequest(request);
+            response.sendHtml();
+
+            // 关闭 socket 对象
+            socket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
