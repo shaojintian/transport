@@ -1,14 +1,12 @@
 package com.my.server;
 
-import com.alibaba.fastjson.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import springfox.documentation.spring.web.json.Json;
+
+
+
 
 import java.io.*;
 import java.net.*;
 public class ServerThread implements Runnable{
-    private static final Logger logger = LoggerFactory.getLogger(ServerThread.class);
     private Socket socket;
     //private T obj;
     private BufferedReader is;
@@ -52,7 +50,7 @@ public class ServerThread implements Runnable{
             try {
                 closeable.close();
             }catch (IOException e){
-                logger.error(e+"");
+                e.printStackTrace();
             }
         }
     }

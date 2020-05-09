@@ -3,8 +3,7 @@ package com.my.server;
 import javax.jws.Oneway;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.File;
+
 
 /*
   HTTP Response =

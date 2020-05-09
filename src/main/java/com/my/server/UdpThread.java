@@ -3,7 +3,6 @@ package com.my.server;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
 
 public class UdpThread implements Runnable{
     private DatagramSocket socket;
@@ -24,14 +23,14 @@ public class UdpThread implements Runnable{
     public void run(){
         try {
             //send req to a specific ip:port
-            System.out.printf(Server.getServerName()+"send req to a specific ip:%d\n",des[number]);
+            System.out.printf(Server.getServerName()+" send req to a specific port:%d\n",des[number]);
             byte[] sendBytes = Integer.toString(des[number]).getBytes();
-            socket.send(new DatagramPacket(sendBytes,sendBytes.length));
+            socket.send(new DatagramPacket(sendBytes,sendBytes.length,InetAddress.getByName("127.0.0.1"),des[number]));
             //recv client name
             byte[] recvBytes = new byte[1024];
             DatagramPacket recvPacket = new DatagramPacket(recvBytes,1024);
             socket.receive(recvPacket);
-            System.out.println(Server.getServerName()+"recv remote name is :"+new String(recvBytes));
+            System.out.println(Server.getServerName()+" recv remote name is :"+new String(recvBytes));
             Server.getDesName().put(des[number], new String(recvBytes));
 
 

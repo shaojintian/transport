@@ -1,6 +1,8 @@
 server
 ```
 java
+javac -d ./target/ ./*.java
+
 ```
 
 

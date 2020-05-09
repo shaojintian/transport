@@ -1,7 +1,5 @@
 package com.my.server;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -11,7 +9,6 @@ import java.util.HashMap;
 
 public class Server {
 
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     public static final String WEB_ROOT = "/Users/my/IntelliJProjects/transport/src/main/java/com/my/server/script";
     private static final HashMap<Integer,String> desName = new HashMap<>();
     private static String name;
@@ -41,9 +38,9 @@ public class Server {
         ServerSocket serverSocket = new ServerSocket(tcpPort);
         //server never stop
         while (true){
-            logger.info("Waiting a socket in ");
+            System.out.println("Waiting a socket in ");
             final Socket socket =  serverSocket.accept();//block here
-            logger.info("start"+socket);
+            System.out.println("start"+socket);
             //并发处理所有调用逻辑
             ServerThread thread  = new ServerThread(socket);
             thread.run();
@@ -64,7 +61,7 @@ public class Server {
         try {
             Server.startService(args);
         }catch (Exception e){
-            logger.error(e+"");
+            e.printStackTrace();
         }
     }
 
