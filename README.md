@@ -1,14 +1,19 @@
-server
+
+run mixture servers in background
+```bash
+cd .../transport/src/main/java/com/my/server
+ ./killservers.sh&&./start.sh  
 ```
-java
-javac -d ./target/ ./*.java
+
+only java servers
+```
+./killservers.sh&& ./sJava.sh 
 
 ```
 
-
-client
+only python servers
 ```
-python+web framework
+./kill.sh&& ./startPyServer.sh
 ```
 
 net
@@ -17,7 +22,7 @@ socket in java and python
 ```
 
 ```
-client --- server
+browser --- server
 type : byte[]
 python client : bytes('xxxx\n',encoding=...)
 because java is readLine() ,need \n to stop.

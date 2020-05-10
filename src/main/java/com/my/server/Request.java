@@ -17,18 +17,21 @@ public class Request {
     //从InputStream中读取request信息，并从request中获取uri值
     public void parse() {
         request = new StringBuffer(2048);
-        int i=-1;
+        int ii=-1;
         byte[] buffer = new byte[2048];
         try {
-            i = input.read(buffer);
+            ii = input.read(buffer);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        for (int j = 0; j < i; j++) {
+        for (int j = 0; j < ii; j++) {
             request.append((char) buffer[j]);
         }
-        System.out.println(request.toString());
+        //print des name map
+        for (int port:Server.getDesName().keySet()) {
+            System.out.println("------------------des name:"+Server.getDesName().get(port)+" port:"+port);
+        }
         uri = parseUri(request.toString());
     }
 

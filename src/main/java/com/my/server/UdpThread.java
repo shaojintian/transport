@@ -1,14 +1,11 @@
 package com.my.server;
 
-
+//
 import java.io.*;
 import java.net.*;
 
 public class UdpThread implements Runnable{
     private DatagramSocket socket;
-    //private T obj;
-    private BufferedReader is;
-    private OutputStream os;
     private int[]des;
     private int number;
     //why need buffer ? because we need to package the req/res
@@ -22,22 +19,23 @@ public class UdpThread implements Runnable{
     @Override
     public void run(){
         try {
-            //send req to a specific ip:port
+            //send req to a specific port ,req is client name
             System.out.printf(Server.getServerName()+" send req to a specific port:%d\n",des[number]);
-            byte[] sendBytes = Integer.toString(des[number]).getBytes();
+            byte[] sendBytes = Server.getServerName().getBytes();
             socket.send(new DatagramPacket(sendBytes,sendBytes.length,InetAddress.getByName("127.0.0.1"),des[number]));
             //recv client name
             byte[] recvBytes = new byte[1024];
             DatagramPacket recvPacket = new DatagramPacket(recvBytes,1024);
             socket.receive(recvPacket);
-            System.out.println(Server.getServerName()+" recv remote name is :"+new String(recvBytes));
-            Server.getDesName().put(des[number], new String(recvBytes));
+            String desName = new String(recvBytes).trim();
+            System.out.println(Server.getServerName()+" recv remote name is :"+desName);
+            Server.getDesName().put(des[number], desName);
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            close(socket);
+            //close(socket);
         }
 
     }
