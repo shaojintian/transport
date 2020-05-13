@@ -16,6 +16,11 @@ only python servers
 ./kill.sh&& ./startPyServer.sh
 ```
 
+
+script
+```
+./buildrandomtables 6
+```
 net
 ```
 socket in java and python
