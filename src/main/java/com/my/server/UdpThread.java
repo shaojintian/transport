@@ -15,6 +15,12 @@ public class UdpThread implements Runnable{
         this.number=i;
         //this.obj=obj;
     }
+    public UdpThread(DatagramSocket socket){
+        this.socket =socket;
+        this.des =null;
+        //this.obj=obj;
+    }
+
 
     @Override
     public void run(){

@@ -1,57 +1,28 @@
 package com.my.server;
 
-import java.net.DatagramPacket;
-
+//
 import java.io.*;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.text.*;
-import java.util.ArrayList;
+import java.net.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
+public class UdpRecvThread implements Runnable{
+    private DatagramSocket socket;
 
-/*
-  HTTP Response =
-    response line
-    response headers
 
-    response body(html)
+    public UdpRecvThread(DatagramSocket socket){
+        this.socket =socket;
 
-*/
-
-public class Response {
-
-    private static final int BUFFER_SIZE = 1024;
-    Request request;
-    OutputStream output;
-
-    public Response(OutputStream output) {
-        this.output = output;
+        //this.obj=obj;this.des =null;
     }
 
-    public void packageRequest(Request request) {
-        this.request = request;
-    }
 
-    public static  int  getDesPort(String desName){
-        for (int udpPort:Server.getDesName().keySet()) {
-            if(Server.getDesName().get(udpPort).equals(desName)){
-                return udpPort;
-            }
-        }
-        return -1;
-    }
-
-    public void sendResponse() throws IOException {
-        //byte[] bytes = new byte[BUFFER_SIZE];
+    private void sendResponse(String uri)throws Exception{
         try {
             //route
-            String response ="HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: text/html\r\n"+
-                    "Content-Length: 100\r\n" + "\r\n" +
-                    "<html><h1>Can't find ant information!</h1><html>";
+            String response ="";
             int flag = -1;
-            String uri = request.getUri().split("=")[1];//  B  des station name
             System.out.println(Server.getServerName()+" go to "+uri);
             //
             //Server.printMap();
@@ -90,48 +61,22 @@ public class Response {
                             "<html><h1>"+recentlyTimeLine+"</h1><html>";
                     System.out.println(response);
                     flag = 1;
+                    socket.send(new DatagramPacket(response.getBytes(),response.getBytes().length,InetAddress.getByName("127.0.0.1"),Response.getDesPort(uri)));
                     break;
                 }
             }
             //indirect arrive
             if(flag != 1){
-                //没有找到
                 if(recentlyTimeLine!=null&&recentlyTimeLine.length()>=5) {
                     String indirectDes = recentlyTimeLine.split(",")[4];//len>=5 Fstation
-                    //
                     FileReader ttIndirect = new FileReader("/Users/shaojintian/IntelliJProjects/transport/src/main/script/tt-"+indirectDes);
-                    bufferedtt = new BufferedReader(ttIndirect);
-                    //leave time /arrive time date format
-                    Date fromDateI = simpleFormat.parse("2020-01-01 "+recentlyArriveT);
-                    recentlyArriveT = "23:59";
-                    //target arrive time
-                    timeLine =null;
-                    while ((timeLine=bufferedtt.readLine())!=null){
-                        //check leave time
-                        //10:36
-                        if(timeLine.split(",").length<4)continue;
-                        if(!timeLine.split(",")[4].equals(uri))continue;
-                        //System.out.println("timeline:"+timeLine);
-                        String leaveT =timeLine.split(",")[0].trim();
-                        String arriveT =timeLine.split(",")[3].trim();//len>=4
-                        Date temLeaveDateI = simpleFormat.parse("2020-01-01 "+leaveT);
-                        if(temLeaveDateI.compareTo(fromDateI)>=0){
-                            if(arriveT.compareTo(recentlyArriveT)<0){//cur < recently
-                                recentlyArriveT = arriveT;
-                                recentlyTimeLine = timeLine;
-                            }
-                        }
-                    }
-                    System.out.println("indirect:"+recentlyTimeLine);
-                    if(recentlyTimeLine.split(",")[4].trim().equals(uri)){
-                        response = "HTTP/1.1 200 OK\r\n" +
-                                "Content-Type: text/html\r\n"+
-                                "Content-Length: 100\r\n" + "\r\n" +
-                                "<html><h1>"+recentlyTimeLine+"</h1><html>";
-                    }
-                    //
+
+                }
+                //间接的行有效
+//                if(recentlyTimeLine!=null&&recentlyTimeLine.length()>=5) {
+//                    String indirectDes = recentlyTimeLine.split(",")[4];//len>=5 xxxxstation
 //                    //get indirect port
-//                    int indirectDesPort = getDesPort(indirectDes);
+//                    int indirectDesPort = Response.getDesPort(indirectDes);
 //                    if (indirectDesPort==-1){
 //                        throw new Exception("can't find indirect des port,its name is:"+indirectDes);
 //                    }
@@ -142,31 +87,58 @@ public class Response {
 ////                            * Host: localhost:xxxx
 ////                            * Connection: keep-alive
 ////                            * Cache-Control: max-age=0
-//                    DatagramPacket  indirectDesName = new DatagramPacket(uri.getBytes(),uri.getBytes().length, InetAddress.getByName("127.0.0.1"),indirectDesPort);
+//                    DatagramPacket  finalDesName = new DatagramPacket(uri.getBytes(),uri.getBytes().length, InetAddress.getByName("127.0.0.1"),indirectDesPort);
 //                    System.out.println("send indirect req...");
-//                    udpSocket.send(indirectDesName);
+//                    udpSocket.send(finalDesName);
 //                    byte[] recvBytes = new byte[1024];
 //                    DatagramPacket recvPacket = new DatagramPacket(recvBytes, 1024);
 //                    udpSocket.receive(recvPacket);
 //                    response = new String(recvBytes).trim();
 //                    System.out.println("indirect res:"+response);
-
-                }
+//
+//                }
             }
 
-            output.write(response.getBytes());
             System.out.println(Server.getServerName()+" send response down");
 
         } catch (Exception e) {
             String errorMessage = "HTTP/1.1 500 INTERNAL SERVER ERR\r\n" +
-                "Content-Type: text/html\r\n"+
-                "Content-Length: 100\r\n" + "\r\n" +
-                "<h1>Internal Server Error"+e+"</h1>";
-            output.write(errorMessage.getBytes());
+                    "Content-Type: text/html\r\n"+
+                    "Content-Length: 100\r\n" + "\r\n" +
+                    "<h1>Internal Server Error"+e+"</h1>";
+            socket.send(new DatagramPacket(errorMessage.getBytes(),errorMessage.getBytes().length,InetAddress.getByName("127.0.0.1"),Response.getDesPort(uri)));
             // thrown if cannot instantiate a File object
             e.printStackTrace();
-        } finally {
-            output.close();
+        }
+    }
+    @Override
+    public void run(){
+        try {
+            //recv client name
+            byte[] recvBytes = new byte[1024];
+            DatagramPacket recvPacket = new DatagramPacket(recvBytes,1024);
+            socket.receive(recvPacket);
+            String desName = new String(recvBytes).trim();
+            System.out.println(Server.getServerName()+" recv remote name is :"+desName);
+            //send req to a specific port ,req is client name
+            sendResponse(desName);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            //close(socket);
+        }
+
+    }
+
+    private void close(Closeable closeable) {
+        if (closeable!=null){
+            try {
+                closeable.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
     }
 }

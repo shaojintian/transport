@@ -30,7 +30,7 @@ public class Request {
         }
         //print des name map
         for (int port:Server.getDesName().keySet()) {
-            System.out.println("------------------des name:"+Server.getDesName().get(port)+" port:"+port);
+            System.out.println("des name:"+Server.getDesName().get(port)+" port:"+port);
         }
         uri = parseUri(request.toString());
     }
